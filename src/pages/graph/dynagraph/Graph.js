@@ -1,4 +1,5 @@
 import { reactive, shallowReactive } from "vue";
+import { GraphConfigure } from './GraphConfigure.js'
 
 export class Node {
   constructor(x, y, name='') {
@@ -24,35 +25,42 @@ export class Edge {
 
 export class Graph {
   constructor(width, height) {
-    this.width = width;
-    this.height = height;
+    this.config = shallowReactive(new GraphConfigure(width, height));
 
     this.node_map = shallowReactive({});
     this.edge_map = shallowReactive({});
 
-    this.init_fresh();
+    this.adj_table = {};
+
     this.init_mouse_interaction();
+
+    shallowReactive(this);
   }
-  add_node(name, pos = null) {
+  add_node(name, pos = undefined) {
     if (!name || this.node_map[name]) return false;
-    if (!pos) pos = [Math.random() * this.width, Math.random() * this.height];
-    this.node_map[name] = reactive(new Node(pos[0], pos[1], name));
+    if (!pos) pos = [Math.random() * this.config.width, Math.random() * this.config.height];
+    this.node_map[name] = shallowReactive(new Node(pos[0], pos[1], name));
+    this.adj_table[name] = {};
     return true;
   }
+  //删除节点时首先会删除与它相连的所有边
   del_node(name) {
+    let tmp = [];
+    for(let x of Object.values(this.adj_table[name])) tmp.push(x.o.name);
+    for(let ename of tmp) this.del_edge(ename);
     delete this.node_map[name];
+    delete this.adj_table[name];
   }
-  add_edge(name1, name2=null, label = '') {
+  //两种添加方式 add_edge('1', '2') 与 add_edge('1 2', undefined)
+  //如果有点不存在则失败
+  add_edge(name1, name2=undefined, label = '') {
     let ename;
-    // ? 'a   b'.split(' ') === ['a', ' ', ' ', 'b']
     if (!name2) ename = name1, [name1, name2] = name1.split(' ');
     else {
       if (name1 > name2) [name1, name2] = [name2, name1];
       ename = name1 + ' ' + name2;
     }
-    // ? 不处理环吗
     if (name1 == name2) return false;
-    // 如果边已存在，更新标签并返回失败
     if (this.edge_map[ename]) {
       this.edge_map[ename].label = label;
       return false;
@@ -62,10 +70,20 @@ export class Graph {
       console.assert(u && v, `It failed to add edge ${ename} because not all the nodes exist.`)
       return false;
     }
-    this.edge_map[ename] = reactive(new Edge(u, v, ename, label));
+    this.edge_map[ename] = shallowReactive(new Edge(u, v, ename, label));
+    this.adj_table[name1][name2] = {
+      o:this.edge_map[ename],
+      to:name2,
+      direction:0
+    }
+    this.adj_table[name2][name1] = {
+      o:this.edge_map[ename],
+      to:name1,
+      direction:1
+    }
     return true;
   }
-  del_edge(name1, name2=null) {
+  del_edge(name1, name2=undefined) {
     let ename;
     if (!name2) ename = name1, [name1, name2] = name1.split(' ');
     else {
@@ -74,38 +92,40 @@ export class Graph {
     }
     if (!this.edge_map[ename]) return false;
     delete this.edge_map[ename];
+    delete this.adj_table[name1][name2];
+    delete this.adj_table[name2][name1];
     return true;
   }
-  // ?
-  init_fresh(e) {
-    let g = this, timer = null;
-    this.fresh = {
-      handle: function (str) {
-        let vmp = {}, emp = {};
-        for (let line of str.split('\n')) {
-          let items = line.split(/[\s]+/)
-          if (items[0]) vmp[items[0]] = items[0];
-          if (items[1]) {
-            vmp[items[1]] = items[1];
-            if (items[0] > items[1]) [items[0], items[1]] = [items[1], items[0]];
-            if (!items[2]) items[2] = '';
-            let ename = items[0] + ' ' + items[1];
-            emp[ename] = String(items[2]);
-          }
-        }
-        for (let k of Object.keys(g.node_map)) if (!(k in vmp)) g.del_node(k);
-        for (let k of Object.keys(g.edge_map)) if (!(k in emp)) g.del_edge(k);
-        for (let k of Object.keys(vmp)) g.add_node(k);
-        for (let [k, v] of Object.entries(emp)) g.add_edge(k, null, v)
-      },
-      on_input: function (e) {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(() => {
-          timer = null;
-          g.fresh.handle(e.target.value);
-        }, 1000);
+  arrow(ename, pos, neg=false){
+    if(!this.edge_map[ename]) return false;
+    this.edge_map[ename].positive_arrow = Boolean(pos);
+    this.edge_map[ename].negative_arrow = Boolean(neg);
+    return true;
+  }
+  keep_in_boundary(node){
+    let bias = this.config.node_radius+5
+    if (node.x < bias) node.x = bias;
+    if (node.x > this.config.width-bias) node.x = this.config.width-bias;
+    if (node.y < bias) node.y = bias;
+    if (node.y > this.config.height-bias) node.y = this.config.height-bias;
+  }
+  str_to_graph(str){
+    let vmp = {}, emp = {};
+    for (let line of str.split('\n')) {
+      let items = line.split(/[\s]+/)
+      if (items[0]) vmp[items[0]] = items[0];
+      if (items[1]) {
+        vmp[items[1]] = items[1];
+        if (items[0] > items[1]) [items[0], items[1]] = [items[1], items[0]];
+        if (!items[2]) items[2] = '';
+        let ename = items[0] + ' ' + items[1];
+        emp[ename] = String(items[2]);
       }
-    };
+    }
+    for (let k of Object.keys(this.edge_map)) if (!(k in emp)) this.del_edge(k);
+    for (let k of Object.keys(this.node_map)) if (!(k in vmp)) this.del_node(k);
+    for (let k of Object.keys(vmp)) this.add_node(k);
+    for (let [k, v] of Object.entries(emp)) this.add_edge(k, null, v)
   }
   init_mouse_interaction() {
     let gmi;

@@ -12,7 +12,6 @@ defineProps(['node', 'graph_configure'])
     <circle
       :cx="node.x" :cy="node.y" :r="graph_configure.node_radius"
       :class="node.style_class"
-      :style="`transition-duration: ${graph_configure.style_transition_time};`"
     ></circle>
     <text 
         :x="node.x" :y="node.y" dy=".35em" text-anchor="middle"
@@ -20,6 +19,7 @@ defineProps(['node', 'graph_configure'])
         font-size="14"
         stroke-width="1"
         :style="`user-select: none;`"
+        v-if="graph_configure.node_radius > 9"
     >{{ node.name }}</text>
   </g>
 </template>
@@ -68,7 +68,7 @@ circle.link_style{
   fill: rgb(135, 157, 101);
   stroke:greenyellow;
   stroke-width: 2;
-  filter: drop-shadow(0px 0px 6px aqua)
+  filter: drop-shadow(0px 0px 6px greenyellow)
 }
 text.link_style{
   stroke: rgb(216, 236, 183);

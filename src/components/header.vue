@@ -69,8 +69,7 @@
         path: '/graph',
         expanded: false,
         children: [
-        { title: '深度优先搜索', path: '/dfs' },
-        { title: '广度优先搜索', path: '/bfs' }
+        { title: '深度/广度优先搜索', path: '/dfs+dfs' },
         ]
     },
     {

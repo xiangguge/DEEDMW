@@ -1,7 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import Graph from '@/pages/graph/graph.vue'
-import Dfs from '@/pages/graph/dfs.vue'
-import Bfs from '@/pages/graph/bfs.vue'
+import DFS_BFS from '@/pages/graph/DFS+BFS.vue'
 import Home from '@/pages/home/home.vue'
 
 const router = createRouter({
@@ -9,8 +8,7 @@ const router = createRouter({
     routes: [
         { path: '/', component: Home },
         { path:'/graph', component:Graph},
-        { path:'/bfs', component:Bfs},
-        { path:'/dfs', component:Dfs},
+        { path:'/dfs+dfs', component:DFS_BFS},
     ]
 })
 
