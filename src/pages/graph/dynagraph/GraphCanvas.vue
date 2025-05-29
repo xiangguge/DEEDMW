@@ -1,25 +1,24 @@
 <script setup>
 defineProps(['graph'])
 
-import node from './Node.vue'
-import edge from "./Edge.vue"
-import {Node, Edge} from "./Graph.js"
+import GraphNode from './Node.vue'
+import GraphEdge from "./Edge.vue"
 
 </script>
 
 <template>
   <svg :width="graph.config.width" :height="graph.config.height">
-    <edge 
+    <GraphEdge 
       v-for="(edge,name) in graph.edge_map"
       :key="name"
       :edge="edge"
       :graph_configure="graph.config"
     />
-    <node 
+    <GraphNode
       v-for="(node,name) in graph.node_map"
       :key="name"
       :node="node"
-      :graph_configure="graph.config"
+      :node_radius="graph.config.node_radius"
       @mousedown="(e)=>graph.mouse_interaction.on_mouse_down(e,node)"
     />
   </svg>

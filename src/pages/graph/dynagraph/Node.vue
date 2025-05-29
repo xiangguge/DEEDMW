@@ -1,16 +1,15 @@
 <script setup>
-defineProps(['node', 'graph_configure'])
+import { onMounted } from 'vue';
+
+defineProps(['node', 'node_radius'])
+onMounted(()=>{
+  console.log("TestNode已挂载");
+})
 </script>
-<!-- 
-  @mouseenter="node.style_class='visited_style'"
-  @mouseleave="node.style_class='init_style'"
-  @mousedown="node.style_class='current_style'"
-  @mouseup="node.style_class='init_style'"
--->
 <template>
   <g>
     <circle
-      :cx="node.x" :cy="node.y" :r="graph_configure.node_radius"
+      :cx="node.x" :cy="node.y" :r="node_radius"
       :class="node.style_class"
     ></circle>
     <text 
@@ -19,7 +18,7 @@ defineProps(['node', 'graph_configure'])
         font-size="14"
         stroke-width="1"
         :style="`user-select: none;`"
-        v-if="graph_configure.node_radius > 9"
+        v-if="node_radius > 9"
     >{{ node.name }}</text>
   </g>
 </template>
