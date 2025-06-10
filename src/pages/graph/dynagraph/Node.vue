@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted } from 'vue';
+import { NodeStyleManager } from '../../../utils/NodeStyleManager.js'
 
 defineProps(['node', 'node_radius'])
 onMounted(()=>{
@@ -71,6 +72,40 @@ circle.link_style{
 }
 text.link_style{
   stroke: rgb(216, 236, 183);
+}
+
+
+/* 新增：起始节点样式 */
+circle.start_node{
+  fill: rgb(72, 118, 255);
+  stroke: rgb(0, 60, 136);
+  stroke-width: 3;
+  filter: drop-shadow(0px 0px 8px rgb(72, 118, 255));
+}
+text.start_node{
+  stroke: rgb(213, 229, 255);
+}
+
+/* 新增：中间节点样式 */
+circle.middle_node{
+  fill: rgb(118, 118, 118);
+  stroke: rgb(76, 76, 76);
+  stroke-width: 2;
+  filter: drop-shadow(0px 0px 6px rgb(118, 118, 118));
+}
+text.middle_node{
+  stroke: rgb(229, 229, 229);
+}
+
+/* 新增：目标节点样式 */
+circle.target_node{
+  fill: rgb(255, 118, 118);
+  stroke: rgb(136, 0, 0);
+  stroke-width: 3;
+  filter: drop-shadow(0px 0px 8px rgb(255, 118, 118));
+}
+text.target_node{
+  stroke: rgb(255, 213, 213);
 }
 
 </style>

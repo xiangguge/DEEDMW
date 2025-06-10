@@ -15,6 +15,9 @@ import { StepForwardFilled, StepBackwardFilled } from '@vicons/antd'
 import { ReplayFilled} from '@vicons/material'
 
 import { NSwitch } from 'naive-ui';
+import { useTitleStore } from '@/stores/title'
+const titleStore = useTitleStore()
+titleStore.setTitle('DFS+BFS')
 
 const graph = new Graph(450, 450);
 const force_layout = new ForceLayout(graph);
