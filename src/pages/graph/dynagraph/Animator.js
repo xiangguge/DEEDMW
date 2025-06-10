@@ -35,7 +35,7 @@ export class Animator{
   }
   step_backward(){
     this.pause();
-    if (this.current_state > 1){
+    if (this.current_state > 0){
       this.event_list[this.current_state].run_backward_function();
       this.current_state -= 1;
       return true;
