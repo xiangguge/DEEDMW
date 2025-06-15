@@ -71,6 +71,7 @@
         children: [
         { title: '深度/广度优先搜索', path: '/dfs+dfs' },
         { title: "Floyd算法", path: '/floyd' },
+        { title: "Huffman编码", path: '/huffman' },
         ]
     },
     {

@@ -176,17 +176,7 @@ export class DfsAnimator extends Animator{
     }
     dfs(start_node_name);
     this.reset();
-    // ani.add_sleep_event(2000);
-    // for(let [ename,edge] of Object.entries(this.graph.edge_map))
-    //   if (!visited_edge[ename]){
-    //     this.add_update_event(edge, 'style_class', "hide_style");
-    //   }
-    //   else{
-    //     // this.add_update_event(edge, false, "positive_arrow");
-    //     // this.add_update_event(edge, false, "negative_arrow");
-    //   }
-    //   this.add_sleep_event(this.time_intervel);
-    // this.event_list[0].run();
+
   }
 }
 
@@ -278,16 +268,5 @@ export class BfsAnimator extends Animator{
     }
     bfs(start_node_name);
     this.reset();
-    // ani.add_sleep_event(2000);
-    // for(let [ename,edge] of Object.entries(this.graph.edge_map))
-    //   if (!visited_edge[ename]){
-    //     this.add_update_event(edge, "hide_style");
-    //   }
-    //   else{
-    //     // this.add_update_event(edge, false, "positive_arrow");
-    //     // this.add_update_event(edge, false, "negative_arrow");
-    //   }
-    //   this.add_sleep_event(this.time_intervel);
-    // this.event_list[0].run();
   }
 }

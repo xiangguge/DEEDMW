@@ -58,12 +58,6 @@ export class ForceLayout{
         }
       }
 
-      // v2d.omul(vec_centroid, 1/node_count);
-      // v2d.osub(vec_centroid, center);
-      // for(let u of Object.keys(nmp)){
-      //   v2d.oadd(nmp[u], vec_centroid, -this.k3/node_count, 0);
-      // }
-
       for(let u of Object.keys(nmp)){
         v2d.oadd(nmp[u], v2d.sub(nmp[u].o, center), -this.k3);
       }
@@ -95,5 +89,48 @@ export class ForceLayout{
   }
   stop_animation(){
     clearInterval(this.timer);
+  }
+}
+
+export class TreeLayout{
+  constructor(graph){
+    this.graph = graph;
+    
+    this.gap_x = 20;
+    this.gap_y = 30;
+  }
+  layout(root_node_name, root_node_pos=undefined){
+    let g = this.graph, l = this;
+    let nmp = {};
+    for(let name of Object.keys(g.node_map)) nmp[name] = {x:0, y:0};
+    let vis = {}, base_x = 0;
+    let dfs = function(un, dep = 0){
+      vis[un] = true;
+      let adj = g.adj_table[un], count_son = 0, sum_son_x = 0;
+      for(let ei of Object.values(adj)){
+        if (vis[ei.to]) continue;
+        dfs(ei.to, dep + 1);
+        count_son += 1;
+        sum_son_x += nmp[ei.to].x
+      }
+      if (count_son === 0){
+        base_x += l.gap_x + g.config.node_radius;
+        nmp[un].x = base_x;
+        base_x += g.config.node_radius;
+      }
+      else{
+        nmp[un].x = sum_son_x / count_son;
+      }
+      nmp[un].y = (2*dep+1)*g.config.node_radius+(dep+1)*l.gap_y;
+    };
+    dfs(root_node_name);
+    let vec_shift = {x:0,y:0};
+    if (root_node_pos){
+      vec_shift = v2d.sub(root_node_pos, nmp[root_node_name])
+    }
+    for(let [name, node] of Object.entries(g.node_map)){
+      v2d.oadd(nmp[name], vec_shift);
+      node.x = nmp[name].x, node.y = nmp[name].y;
+    }
   }
 }

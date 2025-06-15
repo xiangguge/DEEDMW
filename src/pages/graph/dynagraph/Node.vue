@@ -4,7 +4,7 @@ import { NodeStyleManager } from '../../../utils/NodeStyleManager.js'
 
 defineProps(['node', 'node_radius'])
 onMounted(()=>{
-  console.log("TestNode已挂载");
+  
 })
 </script>
 <template>
