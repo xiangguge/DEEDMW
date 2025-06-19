@@ -16,8 +16,6 @@ export class Edge {
     for (let [key, value] of Object.entries({
       u: u, v: v,
       name: name,
-      positive_arrow: false,
-      negative_arrow: false,
       style_class:"init_style",
     })) this[key] = value;
   }
@@ -94,12 +92,6 @@ export class Graph {
     delete this.edge_map[ename];
     delete this.adj_table[name1][name2];
     delete this.adj_table[name2][name1];
-    return true;
-  }
-  arrow(ename, pos, neg=false){
-    if(!this.edge_map[ename]) return false;
-    this.edge_map[ename].positive_arrow = Boolean(pos);
-    this.edge_map[ename].negative_arrow = Boolean(neg);
     return true;
   }
   keep_in_boundary(node){

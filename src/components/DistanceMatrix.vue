@@ -41,7 +41,7 @@ const prevHighlight = ref([]);
 
 
 const formattedMatrix = computed(() => {
-    return props.animator.distMatrix.value?.map(row =>
+    return props.animator.state.value.distMatrix?.map(row =>
         row.map(cell => cell === Infinity ? '∞' : cell === null ? '—' : cell)
     ) || [];
 });
@@ -49,7 +49,7 @@ const formattedMatrix = computed(() => {
 
 
 const isHighlighted = (row, col) => {
-    return props.animator.helightDistMatrix.value?.some(([i, j]) => i === row && j === col);
+    return props.animator.state.value.helightDistMatrix?.some(([i, j]) => i === row && j === col);
 };
 
 

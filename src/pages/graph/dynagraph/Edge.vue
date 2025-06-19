@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { v2d } from './Geograph.js'
 
 const props = defineProps(['edge', 'graph_configure'])
@@ -51,6 +51,10 @@ const labelColor = computed(() => {
   if (edge.weight < 0) return '#F44336';  // 负权重 - 红色
   return '#2196F3';                      // 零权重 - 蓝色
 });
+
+// onMounted(() => {
+//     console.log("edge:", edge)
+// }) 
 </script>
 
 <template>

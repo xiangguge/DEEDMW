@@ -1,35 +1,35 @@
 <template>
     <div id="container">
         <div
-            style="gap:20px; height:fit-content; display: flex; flex-direction: row; justify-content: center; align-items: stretch;">
+            style="gap:20px; height:fit-content; margin: 40px; display: flex; flex-direction: row; justify-content: center; align-items: stretch;">
             <!-- 1. 左侧栏（操作+输入+配置，垂直堆叠） -->
             <div id="config"
-                style="gap:20px; height:fit-content; display: flex; flex-direction: column; justify-content: center; align-items: stretch;">
-                <div style="display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap:20px"
+                style="display: flex; flex-direction: column; justify-content: space-evenly; align-items: stretch; padding: 20px; background-color: #2c2c2c; border-radius: 10px;">
+                <div style="display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; gap:20px"
                     :height="graph.config.height">
                     <div id="operate">
                         <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
-                            <span style="margin-right:5px">Start Node:</span>
-                            <input @change="(e) => { start_node = e.target.value; animator.init(start_node); }"
-                                v-model="start_node" style="width: 100px; text-align: center; " type="text">
+                            <!-- <span style="margin-right:5px">Start Node:</span> -->
+                            <!-- <input @change=\"(e) => { start_node = e.target.value; animator.init(start_node); }\"
+                                v-model=\"start_node\" style=\"width: 100px; text-align: center; \" type=\"text\"> -->
                         </div>
                         <div style="display: flex; flex-direction: row; justify-content: center; gap: 10px">
 
                             <button @click="animator.switch_play_and_pause">
-                                <component :is="animator.is_playing.value ? icons.pause : icons.play" />
+                                ▶
                             </button>
                             <button @click="animator.step_forward">
-                                <component :is="icons.step_forward" />
+                                →
                             </button>
                             <button @click="animator.step_backward">
-                                <component :is="icons.step_backward" />
+                                ←
                             </button>
                             <button @click="animator.reset">
-                                <component :is="icons.replay" />
+                                ⟲
                             </button>
                         </div>
                     </div>
-                    <textarea style="height: 150px ;" @input="on_input" spellcheck="false">{{ default_fresh_input }}
+                    <textarea style="height: 150px; width: 100%; box-sizing: border-box;" @input="on_input" spellcheck="false">{{ default_fresh_input }}
                 </textarea>
                 </div>
                 <div id="menu">
@@ -37,21 +37,6 @@
                     <div class="menu-item">
                         <Slider v-model="graph.config.node_radius" :label="`Node radius`" :min="5" :max="25" />
                     </div>
-                    <!-- <span>Force Layout</span>
-            <div class="menu-item">
-              <span>Active</span>
-              <n-switch 
-                v-model:value="menu.force_layout.is_animated"
-                @update:value="menu.force_layout.change_animated"
-                :rail-style="menu.railStyle"
-                />
-            </div>
-            <div class="menu-item">
-              <Slider v-model="force_layout.ideal_edge_length" :label="'Ideal edge length'" :min="5" :max="250"/>
-            </div>
-            <div class="menu-item">
-              <Slider v-model="force_layout.exclusive_radius" :label="'Exclusive radius'" :min="5" :max="250"/>
-            </div> -->
                     <span>Animation Configuration</span>
                     <div class="menu-item">
                         <label>Time Interval</label>
@@ -71,7 +56,7 @@
                 <div>
                     <IntervalStatus :animator="animator"></IntervalStatus>
                 </div>
-                <div v-if="animator.updated.value">
+                <div v-if="animator.state.value.show">
                     <DistanceComparison :animator="animator"></DistanceComparison>
                 </div>
             </div>
@@ -96,7 +81,7 @@
             <div id="codes"
                 style="display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap:20px ; width:350px">
                 <div>
-                    <CodeHighlighter :highlightedLine="animator.codeline.value" />
+                    <CodeHighlighter :highlightedLine="animator.state.value.codeline" />
                 </div>
 
             </div>
@@ -120,50 +105,50 @@ import CodeHighlighter from '../../components/CodeHighlighter.vue';
 import DistanceComparison from '../../components/DistanceComparison.vue';
 import IntervalStatus from './dynagraph/IntervalStatus.vue'
 import { FloydAnimator } from './dynagraph/FloydAnimator.js';
-import graph_canvas from './dynagraph/GraphCanvas.vue';
+import graph_canvas from './dynagraph/WeightedGraphCanvas.vue';
 import { Play, Pause } from '@vicons/ionicons5'
 import { StepForwardFilled, StepBackwardFilled } from '@vicons/antd'
 import { ReplayFilled } from '@vicons/material'
 import MatrixRenderer from './dynagraph/MatrixRenderer.vue';
+import Slider from './dynagraph/ui/Slider.vue';
+import { NButton } from 'naive-ui';
 
 import { useTitleStore } from '@/stores/title'
 const titleStore = useTitleStore()
-titleStore.setTitle('Floyd算法')
+titleStore.setTitle('Floyd-Warshall')
 
 
 const graph = new WeightedGraph(300, 200);
 const animator = new FloydAnimator(graph)
-
+let initialState = animator.getReadyState();
 
 
 // const force_layout = new ForceLayout(graph);
 
 
-// 控制按钮图标
-let icons = {
-    play: markRaw(Play),
-    pause: markRaw(Pause),
-    step_forward: markRaw(StepForwardFilled),
-    step_backward: markRaw(StepBackwardFilled),
-    replay: markRaw(ReplayFilled)
-}
 
 const default_fresh_input = `
-A B 2
-A C -5
-A D -1
+A B -2
+A C 5
+A D 1
 B D 8
-B C 7
-C D -5`
+B C 2
+C D 5`
 
 
+let on_input_timer = null;
 function on_input(e) {
+    console.log("触发input输入")
+  if (on_input_timer) clearTimeout(on_input_timer);
+  on_input_timer = setTimeout(() => {
+    console.log("触发回调")
+    on_input_timer = null;
     graph.str_to_graph(e.target.value);
-    nodes.value = Object.keys(graph.node_map);
+    console.log("当前graph", animator.graph);
+    animator.setReadyState(initialState);
     animator.init();
-    // 添加调试输出
-    console.log('Updated distanceMatrix in FloydPage:');
-}
+  }, 500);
+};
 let menu = reactive({
     railStyle: ({ focused, checked }) => {
         const style = {};
@@ -373,7 +358,7 @@ onMounted(() => {
 
 .menu-item input {
     width: fit-content;
-    height: 800px;
+    height: auto;
     padding: 2px;
     border-radius: 4px;
     max-width: 50px;
@@ -391,6 +376,3 @@ input[type="number"]::-webkit-inner-spin-button {
 
 }
 </style>
-
-
-

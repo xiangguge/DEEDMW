@@ -47,9 +47,9 @@ const copiedNextMatrix = ref([]);
 // 监听原始数据变化，更新副本
 watch(
     () => [
-        props.animator.helightNextMatrix,
+        props.animator.state.value.helightNextMatrix,
         props.animator.nodeNames,
-        props.animator.nextMatrix
+        props.animator.state.value.nextMatrix
     ],
     ([newHighlights, newNodeNames, newMatrix]) => {
         copiedHighlightedCells.value = toSafeArray(newHighlights);

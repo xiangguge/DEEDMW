@@ -21,8 +21,6 @@ export class Edge {
       name: name,
       label: label,
       weight: weight, // 新增权重字段
-      positive_arrow: false,
-      negative_arrow: false,
       style_class: "init_style",
     }))
       this[key] = value;
@@ -112,12 +110,7 @@ export class WeightedGraph {
     delete this.adj_table[name2][name1];
     return true;
   }
-  arrow(ename, pos, neg = false) {
-    if (!this.edge_map[ename]) return false;
-    this.edge_map[ename].positive_arrow = Boolean(pos);
-    this.edge_map[ename].negative_arrow = Boolean(neg);
-    return true;
-  }
+
   keep_in_boundary(node) {
     let bias = this.config.node_radius + 5;
     if (node.x < bias) node.x = bias;
@@ -160,23 +153,10 @@ export class WeightedGraph {
       this.add_edge(u, v, "", weight); // ✅ label 留空，正确传入 weight
     }
 
-    this.set_arrow_directions(); // 可选：设置箭头方向
+
   }
 
-  set_arrow_directions() {
-    for (let edge of Object.values(this.edge_map)) {
-      if (edge.weight > 0) {
-        edge.positive_arrow = true;
-        edge.negative_arrow = false;
-      } else if (edge.weight < 0) {
-        edge.positive_arrow = false;
-        edge.negative_arrow = true;
-      } else {
-        edge.positive_arrow = false;
-        edge.negative_arrow = false;
-      }
-    }
-  }
+
   init_mouse_interaction() {
     let gmi;
     this.mouse_interaction = {

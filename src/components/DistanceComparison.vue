@@ -1,20 +1,21 @@
 <template>
     <div class="comparison-container">
+        <button class="close-btn" @click="props.animator.state.value.show = false">&times;</button>
         <h3 class="comparison-title">Distance Comparison</h3>
         <div class="comparison-content">
             <!-- 公式展示区 -->
             <div class="formula-section">
                 <div class="formula-text">
-                    <span class="node-label">D({{ props.animator.currentI }},{{ props.animator.currentK }})</span> +
-                    <span class="node-label">D({{ props.animator.currentK }},{{ props.animator.currentJ }})</span> ≤
-                    <span class="node-label">D({{ props.animator.currentI }},{{ props.animator.currentJ }})</span>
+                    <span class="node-label">D({{ props.animator.state.value.currentI }},{{ props.animator.state.value.currentK }})</span> +
+                    <span class="node-label">D({{ props.animator.state.value.currentK }},{{ props.animator.state.value.currentJ }})</span> ≤
+                    <span class="node-label">D({{ props.animator.state.value.currentI }},{{ props.animator.state.value.currentJ }})</span>
                 </div>
                 <div class="formula-values">
-                    <span class="value-item">{{ props.animator.distanceSM.value }}</span> +
-                    <span class="value-item">{{ props.animator.distanceME.value }}</span> ≤
-                    <span class="value-item">{{ props.animator.distanceSE.value }}</span>
+                    <span class="value-item">{{ props.animator.state.value.distanceSM }}</span> +
+                    <span class="value-item">{{ props.animator.state.value.distanceME }}</span> ≤
+                    <span class="value-item">{{ props.animator.state.value.distanceSE }}</span>
                 </div>
-            </div>
+            </div> 
 
             <!-- 比较结果 -->
             <div class="result-section">
@@ -30,7 +31,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted } from 'vue';
+import { computed } from 'vue';
 
 const props = defineProps({
     animator: { type: Object, required: true }
@@ -42,9 +43,9 @@ console.log("调试结果比较组件：",props.animator)
 
 // 计算比较结果
 const compareResult = computed(() => {
-    const sm = parseFloat(props.animator.distanceSM.value);
-    const me = parseFloat(props.animator.distanceME.value);
-    const se = parseFloat(props.animator.distanceSE.value);
+    const sm = parseFloat(props.animator.state.value.distanceSM);
+    const me = parseFloat(props.animator.state.value.distanceME);
+    const se = parseFloat(props.animator.state.value.distanceSE);
 
     // 处理NaN、无穷大或0值
     if (isNaN(sm) || isNaN(me) || isNaN(se) ||
@@ -56,7 +57,7 @@ const compareResult = computed(() => {
     return (sm + me) <= se;
 });
 
-let timeoutId = null;
+
 
 // 结果样式和文本
 const resultClass = computed(() =>
@@ -73,17 +74,7 @@ const resultText = computed(() =>
 
 
 
-// 组件挂载后设置定时器
-onMounted(() => {
-    timeoutId = setTimeout(() => {
-        props.animator.updated.value = false;
-    }, 2000);
-});
 
-// 组件卸载前清除定时器
-onUnmounted(() => {
-    if (timeoutId) clearTimeout(timeoutId);
-});
 
 
 
@@ -92,6 +83,7 @@ onUnmounted(() => {
 <style scoped>
 /* 保持与矩阵组件一致的基础样式 */
 .comparison-container {
+    position: relative; /* 为关闭按钮定位 */
     background-color: #333;
     border: 2px solid aquamarine;
     border-radius: 10px;
@@ -170,4 +162,20 @@ onUnmounted(() => {
 .result-false {
     color: #ef5350;
     /* 红色叉号 */
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 1.5em;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: #fff;
 }</style>

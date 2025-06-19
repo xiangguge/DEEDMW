@@ -1,3 +1,13 @@
+<!--
+ * @Author: 123 1217776571@qq.com
+ * @Date: 2025-06-18 06:49:58
+ * @LastEditors: 123 1217776571@qq.com
+ * @LastEditTime: 2025-06-18 21:07:14
+ * @FilePath: \DEEDMW\src\pages\graph\dynagraph\IntervalStatus.vue
+ * @Description: 
+ * 123dot
+ * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved. 
+-->
 <template>
     <svg :width="graph.config.width" :height="graph.config.height">
         <!-- 绘制边 -->
@@ -38,22 +48,25 @@ const graphConfig = {
 };
 
 const fixedNodePositions = [
-    { x: 150, y: 50 },
     { x: 75, y: 150 },
+    { x: 150, y: 50 },
     { x: 225, y: 150 }
 ];
 
-// **关键修改：使用计算属性获取权重值，保持响应式**
-const distanceSM = computed(() => props.animator.distanceSM.value);
-const distanceME = computed(() => props.animator.distanceME.value);
-const distanceSE = computed(() => props.animator.distanceSE.value);
+// 辅助函数：将 Infinity 转换为 '∞'
+const formatInfinity = (value) => (value === Infinity ? '∞' : value);
+
+// **关键修改：使用计算属性获取权重值，并在显示前格式化**
+const distanceSM = computed(() => formatInfinity(props.animator.state.value.distanceSM));
+const distanceME = computed(() => formatInfinity(props.animator.state.value.distanceME));
+const distanceSE = computed(() => formatInfinity(props.animator.state.value.distanceSE));
 
 const graph = ref({
     config: graphConfig,
     node_map: {
-        nodeI: { x: fixedNodePositions[0].x, y: fixedNodePositions[0].y, name: props.animator.currentI.value || '未命名', style_class: 'start_node', label: '起始节点' },
-        nodeK: { x: fixedNodePositions[1].x, y: fixedNodePositions[1].y, name: props.animator.currentK.value || '未命名', style_class: 'middle_node', label: '中间节点' },
-        nodeJ: { x: fixedNodePositions[2].x, y: fixedNodePositions[2].y, name: props.animator.currentJ.value || '未命名', style_class: 'target_node', label: '目标节点' },
+        nodeI: { x: fixedNodePositions[0].x, y: fixedNodePositions[0].y, name: props.animator.state.value.currentI || '-', style_class: 'start_node', label: '起始节点' },
+        nodeK: { x: fixedNodePositions[1].x, y: fixedNodePositions[1].y, name: props.animator.state.value.currentK || '-', style_class: 'middle_node', label: '中间节点' },
+        nodeJ: { x: fixedNodePositions[2].x, y: fixedNodePositions[2].y, name: props.animator.state.value.currentJ || '-', style_class: 'target_node', label: '目标节点' },
     },
     edge_map: {
         edgeIK: { u: fixedNodePositions[0], v: fixedNodePositions[1], weight: distanceSM, style_class: 'init_style', positive_arrow: true },
@@ -64,14 +77,14 @@ const graph = ref({
 
 // 监听节点名称变化
 watch([
-    () => props.animator.currentI.value,
-    () => props.animator.currentK.value,
-    () => props.animator.currentJ.value
+    () => props.animator.state.value.currentI,
+    () => props.animator.state.value.currentK,
+    () => props.animator.state.value.currentJ
 ], () => {
-    graph.value.node_map.nodeI.name = props.animator.currentI.value || '未命名';
-    graph.value.node_map.nodeK.name = props.animator.currentK.value || '未命名';
-    graph.value.node_map.nodeJ.name = props.animator.currentJ.value || '未命名';
-});
+    graph.value.node_map.nodeI.name = props.animator.state.value.currentI || '-';
+    graph.value.node_map.nodeK.name = props.animator.state.value.currentK || '-';
+    graph.value.node_map.nodeJ.name = props.animator.state.value.currentJ || '-';
+},{immediate: true});
 </script>
 
 <style scoped>
