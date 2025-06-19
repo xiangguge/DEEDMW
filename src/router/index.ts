@@ -9,7 +9,7 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     { path: "/", component: Home },
-    { path: "/graph", component: Graph },
+    { path: "/graph", component: DFS_BFS },
     { path: "/dfs+dfs", component: DFS_BFS },
     { path: "/huffman", name: "Huffman Code", component: Huffman },
     {

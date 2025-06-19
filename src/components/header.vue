@@ -13,7 +13,7 @@
                 <span v-if="item.children" class="arrow">{{ item.expanded ? '▼' : '▶' }}</span>
               </div>
               <ul v-if="item.children && item.expanded" class="submenu">
-                <li v-for="(child, j) in item.children" :key="j">
+                <li v-for="(child, j) in item.children" :key="j" class="menu-li">
                   <router-link :to="child.path" class="link">{{ child.title }}</router-link>
                 </li>
               </ul>
@@ -26,7 +26,7 @@
 </template>
   
 <script setup>
-  import { ref } from 'vue'
+  import { ref, onMounted} from 'vue'
   
   const menuVisible = ref(false)
   const toggleMenu = () => {
@@ -90,6 +90,21 @@
 
   const titleStore = useTitleStore()
   const { currentTitle } = storeToRefs(titleStore)
+
+onMounted(()=>{
+  //When loss focus, the menu hide
+  document.addEventListener('click', (event)=>{
+    // console.log(event.target, event.target.className)
+
+    if (menuVisible.value){
+      let s = event.target.className;
+      if (s == 'menu-btn' || s == 'menu-item' || s == 'dropdown' || s == 'submenu' || s == 'link' ||
+        s == 'router-link-active router-link-exact-active link' || s == 'arrow' || s == 'menu-li'
+      );
+      else menuVisible.value=false;
+    }
+  });
+})
 </script>
 
 
