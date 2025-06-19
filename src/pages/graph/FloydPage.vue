@@ -128,7 +128,7 @@ let initialState = animator.getReadyState();
 
 
 const default_fresh_input = `
-A B -2
+A B 2
 A C 5
 A D 1
 B D 8
